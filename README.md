@@ -17,44 +17,68 @@ This is the output of the live interactive demo. Notice how we seamlessly switch
 <details>
 <summary>🚀 Click to view the full interactive demo output </summary>
 
-=== DPNCY VERSION SWITCHING DEMO ===
+## dpncy Demo: Seamless Version Switching
 
-🔍 Current environment:
-Current flask-login: 0.6.3
+Run `dpncy` and dive into its interactive demo to see how it manages multiple versions of Flask-Login (0.6.3 and 0.4.1) in one environment—without pip reinstalls!
 
-📦 Available isolated versions:
+🎉 Welcome to dpncy - Multi-version intelligent package installer!
+=================================================================
+🔍 Checking system requirements...
+✅ Redis connection: OK
+
+🎯 What would you like to do?
+1. 🚀 Run interactive demo
+2. 📦 Install a package
+3. 📊 View system status
+4. 📖 Show help
+5. ⚙️ Configure settings
+
+Enter your choice (1-5): 1
+
+🎬 Starting interactive demo...
+Continue with demo? (y/N): y
+📥 Installing demo dependencies...
+✅ Demo dependencies installed!
+
+🚀 DPNCY Interactive Demo 🚀
+--------------------------
+1. Install Flask-Login 0.6.3 normally
+2. Use dpncy to install 0.4.1
+3. Show version switching in action
+
+🔧 STEP 1: Normal pip install
+✅ Flask-Login 0.6.3 installed!
+
+✨ STEP 2: dpncy install
+📸 Snapshotting environment...
+⚙️ Installing flask-login==0.4.1...
+🛡️ Downgrade protection activated!
+  - Isolated flask-login v0.4.1 to bubble
+  - Restored flask-login v0.6.3 in main environment
+✅ Environment restored and conflicts isolated!
+🧠 Updating knowledge base...
+✅ Knowledge base updated.
+
+📊 STEP 3: Multi-version status
 🔄 Multi-Version Package System Status
-
 📁 Base directory: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions
 🪝 Import hook installed: ✅
+📦 Isolated Versions: flask-login-0.4.1 (4.7 MB)
 
-📦 Isolated Package Versions (1):
-📁 flask-login-0.4.1 (4.7 MB)
-🔍 Finding loader class...
-Found class with activate_snapshot: DPNCYLoader
-✅ Using DPNCYLoader
+🔥 DEMO READY! Switching versions...
 
 === Testing Flask-Login 0.6.3 ===
-
-🌀 dpncy loader: Activating flask-login==0.6.3...
-✅ Using system-installed flask-login==0.6.3 (no bubble required)
-Active Flask: 3.1.1
+🌀 Activating flask-login==0.6.3...
 Active Flask-Login: 0.6.3
 ✅ Works!
 
 === Testing Flask-Login 0.4.1 ===
-
-🌀 dpncy loader: Activating flask-login==0.4.1...
+🌀 Activating flask-login==0.4.1...
 ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/flask-login-0.4.1
-🔗 Processing 2 dependencies...
-ℹ️  Using system version for flask (no bubble)
-ℹ️  Using system version for werkzeug (no bubble)
-Active Flask: 3.1.1
 Active Flask-Login: 0.4.1
 ✅ Works!
 
-💡 Notice how we switched versions without pip!
-🎉 This is the power of dpncy - dependency hell solved!```
+🎉 dpncy switched versions seamlessly—no pip needed!
 
 </details>
 
