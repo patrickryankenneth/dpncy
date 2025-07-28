@@ -99,7 +99,6 @@ dpncy demo
 🛠️ Installation
 
 For general use after you've tried the demo:
-Generated bash
 
       
 # Clone the repo
