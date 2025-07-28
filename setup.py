@@ -9,13 +9,13 @@ long_description = README.read_text(encoding="utf-8")
 
 setup(
     name="dpncy",
-    version="1.0.0",
+    version="1.0.01",
     author="Patrick Ryan",
-    author_email="your_email@example.com",  # Optional: replace or omit
+    author_email="patrickryankenneth@gmail.com",  # Optional: replace or omit
     description="The Intelligent Python Dependency Resolver",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/minds3t/dpncy",  # Make sure this is correct
+    url="https://github.com/patrickryankenneth/dpncy",  # Make sure this is correct
     packages=find_packages(exclude=["tests*", "examples*"]),
     include_package_data=True,
     install_requires=[
@@ -38,6 +38,6 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.11",
     license="MIT",
 )
