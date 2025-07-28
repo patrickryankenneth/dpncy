@@ -337,6 +337,7 @@ Imagine you're maintaining a Flask app that needs:
 - But your ML pipeline in the same codebase needs `scikit-learn==0.24` which conflicts with newer requests
 
 **Traditional solution:** 3 different environments, complex deployment
+
 **dpncy solution:** One environment, surgical isolation of only the conflicting versions
 
 ---
@@ -396,7 +397,6 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ---
 
-```
 [![Security Audit](https://img.shields.io/badge/Security-100%25_Verified-brightgreen)](https://github.com/your-repo)
 
 ---
