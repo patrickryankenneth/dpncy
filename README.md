@@ -2,7 +2,20 @@
 
 ### One environment. Infinite packages/versions. No duplicates/downgrades ever again.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)      [![Build Status](https://github.com/patrickryankenneth/dpncy/actions/workflows/test.yml/badge.svg)](https://github.com/patrickryankenneth/dpncy/actions)
+<table>
+<tr>
+<td width="50%">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
+
+</td>
+<td width="50%"> 
+  
+[![Build Status](https://github.com/patrickryankenneth/dpncy/actions/workflows/test.yml/badge.svg)](https://github.com/patrickryankenneth/dpncy/actions)  
+
+</td>
+</tr>
+</table>
 
 --- 
 
