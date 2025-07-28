@@ -96,7 +96,8 @@ pip show flask-login | grep Version
 
 ## 🏢 Enterprise Scenario
 *"Our data science team needed 3 versions of TensorFlow (1.15, 2.4, 2.9) 
-in the same JupyterHub environment. dpncy made it work with zero conflicts."*
+in the same JupyterHub environment,
+dpncy made it work with zero conflicts."*
 
 **Before dpncy:**
 - Need Django 3.2 for one project, Django 4.0 for another? → Two virtual environments
