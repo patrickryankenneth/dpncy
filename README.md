@@ -107,6 +107,8 @@ in the same JupyterHub environment. dpncy made it work with zero conflicts."*
 <details>
 <summary>🚀 Click to view the full capabilities and rich metadata </summary>
 dpncy status
+  
+```bash
 🔄 Multi-Version Package System Status
 ==================================================
 📁 Base directory: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions
@@ -114,9 +116,11 @@ dpncy status
 
 📦 Isolated Package Versions (1):
   📁 flask-1.1.2 (0.6 MB)
+```
 
-🎯 Active Versions:
+
 dpncy list
+```bash
 📋 Found 223 packages:
   🛡️💚 absl-py v2.3.1 - Abseil Python Common Libraries, see https://github.com/ab...
   🛡️💚 absl_py v2.3.1.dist - Abseil Python Common Libraries, see https://github.com/ab...
@@ -125,24 +129,39 @@ dpncy list
   🛡️💚 anyio v4.9.0 - High level compatibility layer for multiple asynchronous ...
   🛡️💚 argon2-cffi v25.1.0 - Argon2 for Python
   🛡️💚 argon2-cffi-bindings v21.2.0 - Low-level CFFI bindings for Argon2
-(continues on)
+(continues on..............)
+```
 
 dpncy list click
+```bash
 📋 Found 1 package:
   🛡️💚 click v8.2.1 - Composable command line interface toolkit
+```
 
 redis-cli HGETALL "dpncy:pkg:flask-login"
+```bash
 1) "name"
 2) "flask-login"
 3) "active_version"
 4) "0.6.3"
+```
 
 redis-cli SMEMBERS "dpncy:pkg:flask-login:installed_versions"
+```bash
 1) "0.6.3"
 2) "0.4.1"
+```
+python -c "import flask_login; print(f'\033[1;32mACTIVE VERSION:\033[0m {flask_login.__version__}')"
+```bash
+ACTIVE VERSION: 0.6.3
+```
+pip show flask-login | grep Version
+```bash
+Version: 0.6.3
+```
 
 redis-cli HGETALL "dpncy:pkg:flask-login:0.4.1"
-
+```bash
  1) "help_text"
  2) "No executable binary found."
  3) "Requires-Python"
@@ -211,6 +230,7 @@ redis-cli HGETALL "dpncy:pkg:flask-login:0.4.1"
 66) "true"
 67) "cli_analysis.common_flags"
 68) "[]"
+```
 
 </details>
 
