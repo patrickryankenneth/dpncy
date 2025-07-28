@@ -1,31 +1,43 @@
-# /home/minds3t/stealth/dpncy/setup.py
+#!/usr/bin/env python3
+
 from setuptools import setup, find_packages
+from pathlib import Path
 
-# Core requirements (always installed)
-CORE_REQUIRES = [
-'redis>=4.5.1',
-'packaging>=23.1'
-]
-
-# Demo requirements (only for first-run experience)
-DEMO_REQUIRES = [
-'flask>=2.0.0',
-'flask-login==0.6.3'  # MUST be exact version
-]
+# Load README.md for long_description
+README = Path(__file__).parent / "README.md"
+long_description = README.read_text(encoding="utf-8")
 
 setup(
-name="dpncy",
-version="0.13.0",
-packages=find_packages(),
-install_requires=CORE_REQUIRES,
-extras_require={
-    'demo': DEMO_REQUIRES,  # pip install "dpncy[demo]"
-},
-entry_points={
-    'console_scripts': [
-        'dpncy = dpncy.cli:main',
-        'dpncy-demo = dpncy.demo:run_demo'  # New demo command
+    name="dpncy",
+    version="1.0.0",
+    author="Patrick Ryan",
+    author_email="your_email@example.com",  # Optional: replace or omit
+    description="The Intelligent Python Dependency Resolver",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/minds3t/dpncy",  # Make sure this is correct
+    packages=find_packages(exclude=["tests*", "examples*"]),
+    include_package_data=True,
+    install_requires=[
+        "redis",
+        "packaging",
+        "zstandard",
+        "psycopg2-binary",
+        "python-dotenv",
     ],
-},
-python_requires='>=3.11',
+    entry_points={
+        "console_scripts": [
+            "dpncy=dpncy.cli:main"
+        ],
+    },
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+        "License :: OSI Approved :: MIT License",
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Build Tools",
+    ],
+    python_requires=">=3.7",
+    license="MIT",
 )
