@@ -1,6 +1,6 @@
 # dpncy - The Intelligent Python Dependency Resolver
 
-### One environment - Infinite packages and versions. Zero duplicates, downgrades, or 'could not resolve's.
+### One environment - Infinite packages and versions. Zero duplicates, downgrades, or unresolvables.
 *The only environment you'll ever need.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
