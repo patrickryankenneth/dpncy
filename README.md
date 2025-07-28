@@ -2,6 +2,8 @@
 
 # dpncy - The Intelligent Python Dependency Resolver
 
+### One environment for all your packages.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Tired of creating a new virtual environment for every small dependency conflict? `dpncy` ends Python dependency hell by introducing **"selective version bubbles."**
