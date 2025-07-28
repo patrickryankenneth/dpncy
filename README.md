@@ -82,9 +82,15 @@ Active Flask-Login: 0.4.1
 
 </details>
 
+
+
 ---
 
 ## 🎯 Why dpncy Changes Everything
+
+## 🏢 Enterprise Scenario
+*"Our data science team needed 3 versions of TensorFlow (1.15, 2.4, 2.9) 
+in the same JupyterHub environment. dpncy made it work with zero conflicts."*
 
 **Before dpncy:**
 - Need Django 3.2 for one project, Django 4.0 for another? → Two virtual environments
@@ -95,6 +101,117 @@ Active Flask-Login: 0.4.1
 - One environment, infinite package versions
 - Zero conflicts, zero waste
 - Runtime version switching without pip
+
+---
+
+<details>
+dpncy status
+🔄 Multi-Version Package System Status
+==================================================
+📁 Base directory: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions
+🪝 Import hook installed: ✅
+
+📦 Isolated Package Versions (1):
+  📁 flask-1.1.2 (0.6 MB)
+
+🎯 Active Versions:
+dpncy list
+📋 Found 223 packages:
+  🛡️💚 absl-py v2.3.1 - Abseil Python Common Libraries, see https://github.com/ab...
+  🛡️💚 absl_py v2.3.1.dist - Abseil Python Common Libraries, see https://github.com/ab...
+  🛡️💚 annotated-types v0.7.0 - Reusable constraint types to use with typing.Annotated
+  🛡️💚 annotated_types v0.7.0.dist - Reusable constraint types to use with typing.Annotated
+  🛡️💚 anyio v4.9.0 - High level compatibility layer for multiple asynchronous ...
+  🛡️💚 argon2-cffi v25.1.0 - Argon2 for Python
+  🛡️💚 argon2-cffi-bindings v21.2.0 - Low-level CFFI bindings for Argon2
+(continues on)
+
+dpncy list click
+📋 Found 1 package:
+  🛡️💚 click v8.2.1 - Composable command line interface toolkit
+
+redis-cli HGETALL "dpncy:pkg:flask-login"
+1) "name"
+2) "flask-login"
+3) "active_version"
+4) "0.6.3"
+
+redis-cli SMEMBERS "dpncy:pkg:flask-login:installed_versions"
+1) "0.6.3"
+2) "0.4.1"
+
+redis-cli HGETALL "dpncy:pkg:flask-login:0.4.1"
+
+ 1) "help_text"
+ 2) "No executable binary found."
+ 3) "Requires-Python"
+ 4) ">=3.7"
+ 5) "security.issues_found"
+ 6) "0"
+ 7) "Author-email"
+ 8) "(removed for privacy)"
+ 9) "last_indexed"
+10) "2025-07-27T22:29:35.715001"
+11) "Metadata-Version"
+12) "2.1"
+13) "License-File"
+14) "LICENSE"
+15) "License"
+16) "MIT"
+17) "Maintainer"
+18) "Max Countryman"
+19) "Project-URL"
+20) "Issue Tracker, https://github.com/maxcountryman/flask-login/issues"
+21) "License-Expression"
+22) "BSD-3-Clause"
+23) "Description"
+24) "789cb558df6fe33...(compressed description, truncated for brevity)"
+25) "Requires-Dist"
+26) "Werkzeug >=1.0.1"
+27) "security.audit_status"
+28) "checked_in_bulk"
+29) "security.report"
+30) "[]"
+31) "health.import_check.version"
+32) "0.6.3"
+33) "Description-Content-Type"
+34) "text/markdown"
+35) "health.import_check.importable"
+36) "True"
+37) "Home-page"
+38) "https://github.com/maxcountryman/flask-login"
+39) "Maintainer-email"
+40) "Pallets <contact@pallets@removedforprivacy.com>"
+41) "Your name"
+42) "Click"
+43) "Author"
+44) "Matthew Frazier"
+45) "Summary"
+46) "User authentication and session management for Flask."
+47) "[please donate today]"
+48) "https://palletsprojects.com/donate"
+49) "dependencies"
+50) "[\"Flask >=1.0.4\", \"Werkzeug >=1.0.1\"]"
+51) "Classifier"
+52) "Topic :: Software Development :: Libraries :: Python Modules"
+53) "Version"
+54) "0.6.3"
+55) "name"
+56) "flask-login"
+57) "Name"
+58) "Flask-Login"
+59) "cli_analysis.subcommands"
+60) "[]"
+61) "[contrib]"
+62) "https://palletsprojects.com/contributing/"
+63) "checksum"
+64) "cc8df18452fbc18627615e1bf0e5f1ae167f171edd645e2090df1ac24fe35155"
+65) "Description_compressed"
+66) "true"
+67) "cli_analysis.common_flags"
+68) "[]"
+
+</details>
 
 ---
 
