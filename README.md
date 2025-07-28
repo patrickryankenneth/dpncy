@@ -259,18 +259,24 @@ redis-cli HGETALL "dpncy:pkg:flask-login:0.4.1"
 The best way to see the power of `dpncy` is to run the interactive demo.
 
 # Prerequisites (install these first):
+```bash
 sudo apt-get install redis-server  # Ubuntu/Debian
-
+```
+```bash
 brew install redis                 # macOS
-
+```
 # Start Redis
+```bash
 redis-server
-
+```
 # Verify Redis is running
+```bash
 redis-cli ping  # Should return "PONG"
-  
+  ```
 **Note**: Install `tqdm` for progress bars during metadata building:
+```bash
 pip install tqdm
+  ```
 
 ```bash
 # 1. Clone the repository
