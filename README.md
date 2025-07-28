@@ -260,6 +260,7 @@ The best way to see the power of `dpncy` is to run the interactive demo.
 
 # Prerequisites (install these first):
 sudo apt-get install redis-server  # Ubuntu/Debian
+
 brew install redis                 # macOS
 
 # Start Redis
