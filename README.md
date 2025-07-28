@@ -1,14 +1,36 @@
 # dpncy - The Intelligent Python Dependency Resolver
 
-### One environment. Infinite packages/versions. Zero duplicates/downgrades.
+### One environment. Infinite packages/versions/projects. No duplicates/downgrades ever again.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Tired of creating a new virtual environment for every small dependency conflict? `dpncy` ends Python dependency hell by introducing **"selective version bubbles."**
+--- 
+
+Tired of creating a new virtual environment for every small dependency conflict? I am too.
+
+dpncy ends dependency hell by introducing **"selective version bubbles."**
 
 It's a revolutionary package manager that allows you to run multiple versions of a library in a single environment. It intelligently isolates *only* the conflicting packages while sharing all compatible dependencies. The result is one clean environment, infinite versions, and zero waste.
 
 ---
+
+<table>
+<tr>
+<td width="50%">
+
+## 🌍 Real-World Example
+Imagine maintaining a Flask app that needs:
+- `flask-login==0.4.1` (legacy)
+- `requests==2.28.0` (new)
+- `scikit-learn==0.24` (ML)
+
+**Traditional:**  
+3 separate environments  
+**dpncy:**  
+Single environment  
+
+</td>
+<td width="50%">
 
 ## 🏢 Enterprise Impact
 | Metric               | Before dpncy | After dpncy |
@@ -17,16 +39,9 @@ It's a revolutionary package manager that allows you to run multiple versions of
 | Storage Overhead     | 8.7GB        | 1.2GB       |
 | Setup Time           | 22 min       | 60 sec      |
 
-## 🌍 Real-World Example
-
-Imagine you're maintaining a Flask app that needs:
-- `flask-login==0.4.1` (legacy authentication system)
-- `requests==2.28.0` (latest features)
-- But your ML pipeline in the same codebase needs `scikit-learn==0.24` which conflicts with newer requests
-
-**Traditional solution:** 3 different environments, complex deployment
-
-**dpncy solution:** One environment, surgical isolation of only the conflicting versions
+</td>
+</tr>
+</table>
 
 ---
 
