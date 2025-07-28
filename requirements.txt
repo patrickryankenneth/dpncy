@@ -1,0 +1,4 @@
+# CORE REQUIREMENTS (always needed)
+redis>=4.5.1
+packaging>=23.1
+tqdm==4.65.0
