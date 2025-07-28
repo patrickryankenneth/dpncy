@@ -15,7 +15,7 @@ It's a revolutionary package manager that allows you to run multiple versions of
 This is the output of the live interactive demo. Notice how we seamlessly switch from `flask-login==0.6.3` to `0.4.1` at runtime, without ever changing the environment.
 
 <details>
-<summary>🚀 Click to view the full interactive demo output</summary>
+<summary>🚀 Click to view the full interactive demo output </summary>
 
 === DPNCY VERSION SWITCHING DEMO ===
 
@@ -75,9 +75,12 @@ Active Flask-Login: 0.4.1
 The best way to see the power of `dpncy` is to run the interactive demo.
 
 **Prerequisites:**
-*   Python 3.8+
+*   Python 3.11+
 *   Git
 *   A running Redis server (`redis-server`)
+  
+**Note**: Install `tqdm` for progress bars during metadata building:
+pip install tqdm
 
 ```bash
 # 1. Clone the repository
