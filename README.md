@@ -277,18 +277,20 @@ redis-cli ping  # Should return "PONG"
 ```bash
 pip install tqdm
   ```
-
-```bash
 # 1. Clone the repository
+```bash
 git clone https://github.com/patrickryankenneth/dpncy.git
 cd dpncy
+```
 
 # 2. Install dpncy with its demo dependencies
 # The '.' installs the code in the current directory
+```bash
 pip install ".[demo]"
-
+```
 # 3. Run the interactive demo!
 # This will guide you through installing conflicting versions and show the magic.
+```bash
 dpncy demo
 ```
 
