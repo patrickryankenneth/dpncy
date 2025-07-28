@@ -105,6 +105,7 @@ in the same JupyterHub environment. dpncy made it work with zero conflicts."*
 ---
 
 <details>
+<summary>🚀 Click to view the full capabilities and rich metadata </summary>
 dpncy status
 🔄 Multi-Version Package System Status
 ==================================================
