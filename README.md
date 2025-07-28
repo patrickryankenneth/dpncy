@@ -10,6 +10,26 @@ It's a revolutionary package manager that allows you to run multiple versions of
 
 ---
 
+## 🏢 Enterprise Impact
+| Metric               | Before dpncy | After dpncy |
+|----------------------|--------------|-------------|
+| CI/CD Complexity     | 5 envs       | 1 env       |
+| Storage Overhead     | 8.7GB        | 1.2GB       |
+| Setup Time           | 22 min       | 60 sec      |
+
+## 🌍 Real-World Example
+
+Imagine you're maintaining a Flask app that needs:
+- `flask-login==0.4.1` (legacy authentication system)
+- `requests==2.28.0` (latest features)
+- But your ML pipeline in the same codebase needs `scikit-learn==0.24` which conflicts with newer requests
+
+**Traditional solution:** 3 different environments, complex deployment
+
+**dpncy solution:** One environment, surgical isolation of only the conflicting versions
+
+---
+
 ## See It In Action
 
 This is the output of the live interactive demo. Notice how we seamlessly switch from `flask-login==0.6.3` to `0.4.1` at runtime, without ever changing the environment.
@@ -329,26 +349,6 @@ dpncy list
 # Use dpncy to install a package with version management
 dpncy install "requests==2.20.0"
 ```
---- 
-
-## 🏢 Enterprise Impact
-| Metric               | Before dpncy | After dpncy |
-|----------------------|--------------|-------------|
-| CI/CD Complexity     | 5 envs       | 1 env       |
-| Storage Overhead     | 8.7GB        | 1.2GB       |
-| Setup Time           | 22 min       | 60 sec      |
-
-## 🌍 Real-World Example
-
-Imagine you're maintaining a Flask app that needs:
-- `flask-login==0.4.1` (legacy authentication system)
-- `requests==2.28.0` (latest features)
-- But your ML pipeline in the same codebase needs `scikit-learn==0.24` which conflicts with newer requests
-
-**Traditional solution:** 3 different environments, complex deployment
-
-**dpncy solution:** One environment, surgical isolation of only the conflicting versions
-
 ---
 
 ## How It Works
