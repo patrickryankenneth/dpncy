@@ -1,9 +1,0 @@
-{
-  "paths_to_index": ["YOUR_PYTHON_BIN_PATH"],
-  "site_packages_path": "YOUR_SITE_PACKAGES_PATH",
-  "redis_host": "YOUR_REDIS_HOST",
-  "redis_port": 6379,
-  "redis_key_prefix": "dpncy:pkg:",
-  "python_executable": "YOUR_PYTHON_EXECUTABLE",
-  "multiversion_base": "YOUR_SITE_PACKAGES_PATH/.dpncy_versions"
-}

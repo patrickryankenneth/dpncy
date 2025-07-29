@@ -77,6 +77,8 @@ class DpncyMetadataGatherer:
         self.redis_client = None
         self.force_refresh = force_refresh
         self.security_report = {}
+        config_manager = ConfigManager()
+        self.config = config_manager.config # This creates the attribute that was missing
         if self.force_refresh: 
             print("🟢 --force flag detected. Caching will be ignored.")
         if not HAS_TQDM: 
@@ -85,8 +87,8 @@ class DpncyMetadataGatherer:
     def connect_redis(self) -> bool:
         try:
             self.redis_client = redis.Redis(
-                host=config["redis_host"], 
-                port=config["redis_port"], 
+                host=self.config["redis_host"], 
+                port=self.config["redis_port"], 
                 decode_responses=True
             )
             self.redis_client.ping()
@@ -112,7 +114,7 @@ class DpncyMetadataGatherer:
             print(f"⚠️ Error discovering packages from importlib.metadata: {e}")
 
         # 2. Scan .dist-info/egg-info directly in main site-packages
-        site_packages = Path(config["site_packages_path"])
+        site_packages = Path(self.config["site_packages_path"])
         if site_packages.is_dir():
             for item in site_packages.iterdir():
                 if item.is_dir() and (item.name.endswith('.dist-info') or item.name.endswith('.egg-info')):
@@ -125,7 +127,7 @@ class DpncyMetadataGatherer:
                             active_packages[pkg_name] = pkg_version
 
         # 3. Discover packages from the .dpncy_versions isolation area
-        multiversion_base_path = Path(config["multiversion_base"])
+        multiversion_base_path = Path(self.config["multiversion_base"])
         if multiversion_base_path.is_dir():
             for isolated_pkg_dir in multiversion_base_path.iterdir():
                 if isolated_pkg_dir.is_dir() and '-' in isolated_pkg_dir.name:
@@ -167,7 +169,7 @@ class DpncyMetadataGatherer:
             return
             
         for pkg_name, version in active_packages.items():
-            main_key = f"{config['redis_key_prefix']}{pkg_name}"
+            main_key = f"{self.config['redis_key_prefix']}{pkg_name}"
             try:
                 self.redis_client.hset(main_key, "active_version", version)
             except Exception as e:
@@ -198,7 +200,7 @@ class DpncyMetadataGatherer:
             if HAS_TQDM: 
                 package_iterator.set_postfix_str(f"Current: {package_name} v{version_str}", refresh=True)
             try:
-                version_key = f"{config['redis_key_prefix']}{package_name.lower()}:{version_str}"
+                version_key = f"{self.config['redis_key_prefix']}{package_name.lower()}:{version_str}"
                 previous_data = self.redis_client.hgetall(version_key)
                 
                 metadata = self._build_comprehensive_metadata(package_name, previous_data, version_str)
@@ -220,36 +222,80 @@ class DpncyMetadataGatherer:
     def _build_comprehensive_metadata(self, package_name: str, previous_data: Dict, specific_version: str) -> Dict:
         metadata = {
             'name': package_name,
-            'Version': specific_version,
+            'Version': specific_version, # Keep this as the target version
             'last_indexed': datetime.now().isoformat()
         }
 
-        # Try to get metadata from active environment first
-        dist = self._get_distribution(package_name)
-        package_files = self._find_package_files(dist, package_name)
+        # --- NEW LOGIC START ---
+        # First, try to get metadata directly from the specific isolated version's .dist-info/egg-info
+        # OR from the main site-packages if it matches the specific_version.
+        
+        found_specific_version_dist = False
+        
+        # Check in .dpncy_versions bubble first if specific_version is isolated
+        version_path = Path(self.config["multiversion_base"]) / f"{package_name}-{specific_version}"
+        if version_path.is_dir():
+            dist_info = next((p for p in version_path.glob('*.dist-info') if p.is_dir()), None)
+            if not dist_info: # Fallback for .egg-info
+                 dist_info = next((p for p in version_path.glob('*.egg-info') if p.is_dir()), None)
 
-        # If dist is not found or version doesn't match, check .dpncy_versions
-        if not dist or (dist and dist.metadata.get('Version') != specific_version):
-            version_path = Path(config["multiversion_base"]) / f"{package_name}-{specific_version}"
-            if version_path.is_dir():
-                dist_info = next((p for p in version_path.glob('*.dist-info') if p.is_dir()), None)
-                if dist_info:
-                    try:
-                        metadata_file = dist_info / 'METADATA'
-                        if metadata_file.exists():
-                            with open(metadata_file, 'r', encoding='utf-8') as f:
-                                metadata.update(self._parse_metadata_file(f.read()))
-                    except Exception as e:
-                        print(f"⚠️ Error parsing metadata from {version_path}: {e}")
+            if dist_info:
+                try:
+                    # Prefer METADATA or PKG-INFO
+                    metadata_file = dist_info / 'METADATA'
+                    if not metadata_file.exists():
+                        metadata_file = dist_info / 'PKG-INFO'
+                    
+                    if metadata_file.exists():
+                        with open(metadata_file, 'r', encoding='utf-8') as f:
+                            parsed_file_metadata = self._parse_metadata_file(f.read())
+                            metadata.update(parsed_file_metadata)
+                            # Ensure the 'Version' in metadata reflects the file's content
+                            # The file should contain the correct version itself.
+                            if 'Version' in parsed_file_metadata:
+                                metadata['Version'] = parsed_file_metadata['Version']
+                            if 'Requires-Dist' in parsed_file_metadata:
+                                # Parse Requires-Dist into 'dependencies' list
+                                # This handles multi-line Requires-Dist if present in file
+                                reqs = [r.strip() for r in parsed_file_metadata['Requires-Dist'].split('\n') if r.strip()]
+                                metadata['dependencies'] = reqs
+                            elif 'Requires' in parsed_file_metadata: # Older format
+                                reqs = [r.strip() for r in parsed_file_metadata['Requires'].split('\n') if r.strip()]
+                                metadata['dependencies'] = reqs
 
-        if dist:
-            for k, v in dist.metadata.items():
-                metadata[k] = v
-            metadata['dependencies'] = [str(req) for req in dist.requires] if dist.requires else []
+                            found_specific_version_dist = True # We successfully parsed metadata for the specific version
+                except Exception as e:
+                    print(f"⚠️ Error parsing metadata from {version_path}: {e}")
 
+        # If we didn't find specific metadata in a bubble, try to get it from importlib.metadata
+        # but ONLY if the *active* distribution matches the specific_version we are trying to index.
+        if not found_specific_version_dist:
+            dist = self._get_distribution(package_name) # This gets the *active* one
+            if dist and dist.metadata.get('Version') == specific_version:
+                for k, v in dist.metadata.items():
+                    metadata[k] = v
+                metadata['dependencies'] = [str(req) for req in dist.requires] if dist.requires else []
+                found_specific_version_dist = True
+        
+        # Fallback for 'dependencies' if not found yet (e.g., from parsing dist.requires)
+        if 'dependencies' not in metadata:
+            metadata['dependencies'] = []
+
+        # --- NEW LOGIC END ---
+
+        # The rest of the function should use the now correctly populated 'metadata' dictionary.
+        # Ensure _enrich_from_site_packages also targets the specific version's path
         metadata.update(self._enrich_from_site_packages(package_name, specific_version))
 
         if self.force_refresh or 'help_text' not in previous_data:
+            # Need to carefully handle package_files path here for the correct version's binaries
+            # This is complex because _find_package_files currently relies on 'dist' which is active.
+            # You might need a new function like _find_specific_version_files(package_name, specific_version)
+            # For now, let's keep it, but be aware it might still get binaries from the active version
+            # if specific_version isn't a bubble with its own binaries.
+            active_dist_for_files = self._get_distribution(package_name) # This will be the active one
+            package_files = self._find_package_files(active_dist_for_files, package_name)
+
             if package_files.get('binaries'):
                 metadata.update(self._get_help_output(package_files['binaries'][0]))
             else:
@@ -259,8 +305,9 @@ class DpncyMetadataGatherer:
 
         metadata['cli_analysis'] = self._analyze_cli(metadata.get('help_text', ''))
         metadata['security'] = self._get_security_info(package_name)
-        metadata['health'] = self._perform_health_checks(package_name, package_files)
-        
+        # _perform_health_checks also needs to be careful about what environment it runs in
+        metadata['health'] = self._perform_health_checks(package_name, package_files) # This will run against the active version
+
         return metadata
 
     def _parse_metadata_file(self, metadata_content: str) -> Dict:
@@ -280,10 +327,28 @@ class DpncyMetadataGatherer:
         return metadata
 
     def _store_in_redis(self, package_name: str, version_str: str, metadata: Dict):
+        """
+        Store package metadata in Redis with proper indexing for discovery.
+        
+        This creates a hierarchical structure:
+        - dpncy:pkg:flask-login:0.4.1 -> detailed metadata for specific version
+        - dpncy:pkg:flask-login:installed_versions -> set of all versions  
+        - dpncy:pkg:versions -> master index for `dpncy list` command
+        - dpncy:pkg:index -> set of all package names
+        """
         pkg_name_lower = package_name.lower()
-        version_key = f"{config['redis_key_prefix']}{pkg_name_lower}:{version_str}"
-        data_to_store = metadata.copy()
+        
+        # KEY 1: The detailed key for this specific version (e.g., dpncy:pkg:flask-login:0.4.1)
+        version_key = f"{self.config['redis_key_prefix']}{pkg_name_lower}:{version_str}"
+        
+        # KEY 2: The main key for the package (e.g., dpncy:pkg:flask-login)
+        main_key = f"{self.config['redis_key_prefix']}{pkg_name_lower}"
 
+        # KEY 3: The master index of all packages for the `list` command
+        master_versions_key = f"{self.config['redis_key_prefix']}versions"
+
+        # --- Prepare the data (compression logic) ---
+        data_to_store = metadata.copy()
         for field in ['help_text', 'readme_snippet', 'license_text', 'Description']:
             if field in data_to_store and isinstance(data_to_store[field], str) and len(data_to_store[field]) > 500:
                 compressed = zlib.compress(data_to_store[field].encode('utf-8'))
@@ -291,14 +356,33 @@ class DpncyMetadataGatherer:
                 data_to_store[f"{field}_compressed"] = 'true'
 
         flattened_data = self._flatten_dict(data_to_store)
-        main_key = f"{config['redis_key_prefix']}{pkg_name_lower}"
-
+        
+        # --- Execute all writes in a single, efficient transaction ---
         with self.redis_client.pipeline() as pipe:
+            # 1. Write the detailed metadata for the specific version
             pipe.delete(version_key)
             pipe.hset(version_key, mapping=flattened_data)
-            pipe.hset(main_key, "name", package_name)
+
+            # 2. Update the package's set of known installed versions
             pipe.sadd(f"{main_key}:installed_versions", version_str)
-            pipe.sadd(f"{config['redis_key_prefix']}index", pkg_name_lower)
+            
+            # 3. CRITICAL FIX: Update the master index for `dpncy list`
+            # ALWAYS add to master index so ALL packages show up in `dpncy list`
+            pipe.hset(master_versions_key, pkg_name_lower, version_str)
+            pipe.hset(main_key, "name", package_name)  # Store original case name
+            
+            # 4. Track which version is ACTIVE vs in bubble
+            version_path = Path(self.config["multiversion_base"]) / f"{package_name}-{version_str}"
+            if not version_path.is_dir():
+                # This version is active in main environment
+                pipe.hset(main_key, "active_version", version_str)
+            else:
+                # This version is in a bubble - mark it as such
+                pipe.hset(main_key, f"bubble_version:{version_str}", "true")
+
+            # 4. Update the global index of all package names
+            pipe.sadd(f"{self.config['redis_key_prefix']}index", pkg_name_lower)
+            
             pipe.execute()
 
     def _perform_health_checks(self, package_name: str, package_files: Dict) -> Dict:
@@ -318,7 +402,7 @@ class DpncyMetadataGatherer:
         script = f"import importlib.metadata; print(importlib.metadata.version('{package_name.replace('-', '_')}'))"
         try:
             result = subprocess.run(
-                [config["python_executable"], "-c", script], 
+                [self.config["python_executable"], "-c", script], 
                 capture_output=True, text=True, check=True, timeout=5
             )
             return {'importable': True, 'version': result.stdout.strip()}
@@ -356,11 +440,11 @@ class DpncyMetadataGatherer:
         files = {'binaries': []}
         if dist and dist.files:
             for file_path in dist.files:
-                full_path = Path(config["site_packages_path"]).parent / file_path
+                full_path = Path(self.config["site_packages_path"]).parent / file_path
                 if "bin/" in str(file_path) and full_path.exists():
                     files['binaries'].append(str(full_path))
         if not files['binaries']:
-            for bin_dir in config["paths_to_index"]:
+            for bin_dir in self.config["paths_to_index"]:
                 potential_binary = Path(bin_dir) / package_name.lower()
                 if potential_binary.exists() and os.access(potential_binary, os.X_OK):
                     files['binaries'].append(str(potential_binary))
@@ -374,7 +458,7 @@ class DpncyMetadataGatherer:
                 for name, version in packages.items():
                     f.write(f"{name}=={version}\n")
             result = subprocess.run([
-                config["python_executable"], "-m", "safety", "check",
+                self.config["python_executable"], "-m", "safety", "check",
                 "-r", reqs_file_path, "--json"
             ], capture_output=True, text=True, timeout=120)
             if result.stdout:
@@ -473,10 +557,10 @@ class DpncyMetadataGatherer:
     def _enrich_from_site_packages(self, name: str, version: str = None) -> Dict:
         enriched_data = {}
         guesses = set([name, name.lower().replace('-', '_')])
-        base_path = Path(config["site_packages_path"])
+        base_path = Path(self.config["site_packages_path"])
         
         if version:
-            base_path = Path(config["multiversion_base"]) / f"{name}-{version}"
+            base_path = Path(self.config["multiversion_base"]) / f"{name}-{version}"
         
         for g in guesses:
             pkg_path = base_path / g

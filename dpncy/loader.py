@@ -1,130 +1,78 @@
 import sys
-import os
 import json
-import redis
 from pathlib import Path
-from packaging.requirements import Requirement
-from packaging.specifiers import SpecifierSet
-from packaging.version import Version
-from importlib.metadata import version as get_installed_version, PackageNotFoundError
-from dpncy.core import ConfigManager
+import site
+from importlib.metadata import version as get_version, PackageNotFoundError
 
 class DPNCYLoader:
+    """
+    Activates isolated package environments (bubbles) created by dpncy,
+    or confirms if the requested version is already active in the system.
+    """
     def __init__(self):
-        # Load configuration using ConfigManager
-        config_manager = ConfigManager()
-        self.config = config_manager.config
-        
-    def system_version_matches(self, pkg_name, requested_version):
+        # Auto-discover the multiversion base path from the installed package location
         try:
-            return get_installed_version(pkg_name) == requested_version
-        except PackageNotFoundError:
+            site_packages_path = next(p for p in sys.path if 'site-packages' in p and Path(p).is_dir())
+            self.multiversion_base = Path(site_packages_path) / ".dpncy_versions"
+        except StopIteration:
+            print("⚠️ [dpncy loader] Could not auto-detect site-packages path.")
+            self.multiversion_base = None
+
+    def activate_snapshot(self, package_spec: str) -> bool:
+        """
+        Activates a specific package version bubble, or confirms if the
+        version is already the active system version.
+        Example: activate_snapshot("flask-login==0.4.1")
+        """
+        print(f"\n🌀 dpncy loader: Activating {package_spec}...")
+        
+        try:
+            pkg_name, requested_version = package_spec.split('==')
+        except ValueError:
+            print(f"    ❌ Invalid package_spec format. Expected 'name==version', got '{package_spec}'.")
             return False
 
-    def activate_snapshot(self, package_spec: str, verbose: bool = True):
-        """Smart bubble activator that handles version ranges and physical bubbles"""
+        # --- THE CRUCIAL FIX ---
+        # First, check if the currently installed system version already matches.
         try:
-            if verbose:
-                print(f"\n🌀 dpncy loader: Activating {package_spec}...")
-
-            if '==' not in package_spec:
-                raise ValueError(f"Requires 'name==version' format, got: {package_spec}")
-            
-            pkg_name, version = package_spec.split('==', 1)
-            pkg_name = pkg_name.lower().replace('_', '-')
-
-            if self.system_version_matches(pkg_name, version):
-                if verbose:
-                    print(f"    ✅ Using system-installed {pkg_name}=={version} (no bubble required)")
+            active_version = get_version(pkg_name)
+            if active_version == requested_version:
+                print(f"    ✅ System version already matches requested version ({active_version}). No bubble activation needed.")
                 return True
+        except PackageNotFoundError:
+            # The package isn't in the main environment, so we must use a bubble.
+            pass
+        
+        # If the system version doesn't match, proceed to find and activate a bubble.
+        if not self.multiversion_base or not self.multiversion_base.exists():
+            print(f"    ❌ Bubble directory not found at {self.multiversion_base}")
+            return False
 
-            r = redis.Redis(
-                host=self.config['redis_host'],
-                port=self.config['redis_port'],
-                decode_responses=True
-            )
-            
-            version_keys = r.keys(f"dpncy:pkg:{pkg_name}:*")
-            available_versions = [k.split(':')[-1] for k in version_keys 
-                               if not k.endswith(('installed_versions', '.dist'))]
-            
-            if not available_versions:
-                if verbose:
-                    print(f"    ❌ No versions found for {pkg_name} in Redis")
+        try:
+            bubble_dir_name = f"{pkg_name}-{requested_version}"
+            bubble_path = self.multiversion_base / bubble_dir_name
+
+            if not bubble_path.is_dir():
+                print(f"    ❌ Bubble not found for {package_spec} at {bubble_path}")
                 return False
 
-            selected_version = version if version in available_versions else None
+            # This is the simple, correct "uber-bubble" activation logic.
+            bubble_path_str = str(bubble_path)
+            if bubble_path_str in sys.path:
+                sys.path.remove(bubble_path_str) # Ensure it's at the very front
             
-            if not selected_version:
-                try:
-                    req = Requirement(f"{pkg_name}=={version}")
-                    for v in sorted(available_versions, key=Version, reverse=True):
-                        if req.specifier.contains(v):
-                            selected_version = v
-                            break
-                except Exception as e:
-                    if verbose:
-                        print(f"    ⚠️  Version parsing error: {e}")
-
-            if not selected_version:
-                if verbose:
-                    print(f"    ❌ No compatible version found for {pkg_name}=={version}")
-                    print(f"    Available: {available_versions}")
-                return False
-
-            bubble_path = Path(self.config['multiversion_base']) / f"{pkg_name}-{selected_version}"
-            if not bubble_path.exists():
-                if verbose:
-                    print(f"    ❌ Bubble directory missing: {bubble_path}")
-                return False
-
-            if str(bubble_path) not in sys.path:
-                sys.path.insert(0, str(bubble_path))
-                if verbose:
-                    print(f"    ✅ Activated bubble: {bubble_path}")
-
-            pkg_data = r.hgetall(f"dpncy:pkg:{pkg_name}:{selected_version}")
-            deps_json = pkg_data.get('dependencies', '[]')
+            sys.path.insert(0, bubble_path_str)
+            print(f"    ✅ Activated bubble: {bubble_path_str}")
             
-            try:
-                dependencies = json.loads(deps_json)
-            except json.JSONDecodeError:
-                dependencies = []
-
-            if dependencies and verbose:
-                print(f"    🔗 Processing {len(dependencies)} dependencies...")
-
-            for dep_spec in dependencies:
-                try:
-                    req = Requirement(dep_spec)
-                    dep_pkg = req.name.lower().replace('_', '-')
-                    
-                    dep_version_keys = r.keys(f"dpncy:pkg:{dep_pkg}:*")
-                    dep_versions = [v.split(':')[-1] for v in dep_version_keys 
-                                  if not v.endswith(('installed_versions', '.dist'))]
-                    
-                    best_version = None
-                    for v in sorted(dep_versions, key=Version, reverse=True):
-                        if req.specifier.contains(v):
-                            best_version = v
-                            break
-                    
-                    if best_version:
-                        dep_bubble_path = Path(self.config['multiversion_base']) / f"{dep_pkg}-{best_version}"
-                        if dep_bubble_path.exists():
-                            self.activate_snapshot(f"{dep_pkg}=={best_version}", verbose)
-                        elif verbose:
-                            print(f"    ℹ️  Using system version for {dep_pkg} (no bubble)")
-                    elif verbose:
-                        print(f"    ⚠️  No compatible version for {dep_spec}")
-                        
-                except Exception as e:
-                    if verbose:
-                        print(f"    ⚠️  Failed to process {dep_spec}: {str(e)}")
+            manifest_path = bubble_path / '.dpncy_manifest.json'
+            if manifest_path.exists():
+                with open(manifest_path, 'r') as f:
+                    manifest = json.load(f)
+                    pkg_count = len(manifest.get('packages', {}))
+                    print(f"    ℹ️  Bubble contains {pkg_count} packages.")
 
             return True
 
         except Exception as e:
-            if verbose:
-                print(f"    ❌ Activation failed: {str(e)}")
+            print(f"    ❌ Error during bubble activation for {package_spec}: {e}")
             return False
