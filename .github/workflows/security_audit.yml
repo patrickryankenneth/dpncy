@@ -18,13 +18,16 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # Changed to a specific version for robustness
+          python-version: '3.11'
+
+      - name: Install build tools and update setuptools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
 
       - name: Install dpncy with its dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install ".[demo]"
 
       - name: Run pip-audit
         uses: pypa/gh-action-pip-audit@v1.1.0
-        # No 'with:' section initially, if you don't need to pass inputs
+        # No 'with:' section needed if you're just doing a default scan
