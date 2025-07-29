@@ -18,6 +18,8 @@
 </table>
 
 --- 
+[![Security Audit](https://github.com/patrickryankenneth/dpncy/actions/workflows/security_audit.yml/badge.svg)](https://github.com/patrickryankenneth/dpncy/actions/workflows/security_audit.yml)
+---
 
 Tired of creating a new virtual environment for every small dependency conflict? I am too.
 
