@@ -1,0 +1,36 @@
+name: Security Audit
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Use the Python version dpncy supports, e.g., '3.11'
+
+      - name: Install dpncy with its dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[demo]" # Or just "." if that installs your core deps
+
+      - name: Run pip-audit
+        # Use the official GitHub Action for pip-audit
+        uses: pypa/gh-action-pip-audit@v1.1.0 # Check GitHub Marketplace for the latest version
+        with:
+          # By default, this action scans the current environment.
+          # If dpncy itself has a requirements.txt, you might use:
+          # inputs: requirements.txt
+          # You can also use --ignore-vuln to ignore known false positives or specific IDs
+          # internal-be-careful-extra-flags: "--ignore-vuln GHSA-XXXX-YYYY-ZZZZ"
