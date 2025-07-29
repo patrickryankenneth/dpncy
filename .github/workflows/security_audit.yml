@@ -18,19 +18,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x' # Use the Python version dpncy supports, e.g., '3.11'
+          python-version: '3.11' # Changed to a specific version for robustness
 
       - name: Install dpncy with its dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ".[demo]" # Or just "." if that installs your core deps
+          pip install ".[demo]"
 
       - name: Run pip-audit
-        # Use the official GitHub Action for pip-audit
-        uses: pypa/gh-action-pip-audit@v1.1.0 # Check GitHub Marketplace for the latest version
-        with:
-          # By default, this action scans the current environment.
-          # If dpncy itself has a requirements.txt, you might use:
-          # inputs: requirements.txt
-          # You can also use --ignore-vuln to ignore known false positives or specific IDs
-          # internal-be-careful-extra-flags: "--ignore-vuln GHSA-XXXX-YYYY-ZZZZ"
+        uses: pypa/gh-action-pip-audit@v1.1.0
+        # No 'with:' section initially, if you don't need to pass inputs
