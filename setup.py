@@ -9,7 +9,7 @@ long_description = README.read_text(encoding="utf-8")
 
 setup(
     name="dpncy",
-    version="1.0.01",
+    version="1.0.1",
     author="Patrick Ryan",
     author_email="patrickryankenneth@gmail.com",  # Optional: replace or omit
     description="The Intelligent Python Dependency Resolver",
