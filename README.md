@@ -15,10 +15,10 @@
 
 <table>
   <tr>
-    <td style="width: 50%; vertical-align: top;">
+    <td style="width: 65%; vertical-align: top;">
       <img src="dpncy-demo.gif" alt="dpncy demo" style="max-width: 100%; border-radius: 8px;" />
     </td>
-    <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+    <td style="width: 35%; vertical-align: top; padding-left: 20px;">
       <blockquote>
 <p><strong>Words aren't enough.</strong> The best way to understand the power of <code>dpncy</code> is to see it live in action.</p>
         ⚠️ Pip just broke your environment (as usual).<br>
