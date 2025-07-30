@@ -26,6 +26,7 @@
         🎯 And now you can run both versions <em>in the same script</em>!!!
       </blockquote>
       <p>Yes, really. This is dependency conflict surgery, not another bandaid.</p>
+      <p> Shareable GIF: https://imgur.com/gallery/dpncy-demo-v1-0-4-IWBGBTl </p>
     </td>
   </tr>
 </table>
