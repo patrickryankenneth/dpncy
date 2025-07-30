@@ -7,7 +7,7 @@
 
 # dpncy - The Intelligent Python Dependency Resolver
 
-### One environment. Unlimited packages/versions/dependencies. No duplicates/downgrades ever again. You can safely delete pipx, uv, conda, Docker, etc. today.
+### One environment. Unlimited packages/versions/dependencies. No duplicates/downgrades ever again. You can significantly reduce your reliance on pipx, uv, conda, Docker, etc. today.
 
 ---
 
@@ -24,8 +24,8 @@
  🎯 And now you can run both versions <em>in the same script</em>!!!
 </blockquote>
 
-<p>Yes, really. This is dependency conflict surgery, not another bandaid.</p>
-<p> Shareable GIF: https://imgur.com/gallery/dpncy-demo-v1-0-4-IWBGBTl </p>
+<p>Yes, really. This is TRUE dependency conflict resolution, not another bandaid solution!</p>
+<p> Shareable GIF link: https://imgur.com/gallery/dpncy-demo-v1-0-4-IWBGBTl </p>
 
 Tired of creating a new virtual environment for every small dependency conflict? I was too, until now.
 
@@ -89,6 +89,7 @@ Single environment
 ## 🧠 Key Features
 
 *   **Intelligent Downgrade Protection:** Automatically detects and prevents `pip` installs that would break your existing environment.
+*   **No need to specify versions on import! dpncy intelligently ensures your script uses the correct, isolated version seamlessly, letting you simply import your_multiple_version_package the same way you would if you had one!
 *   **Surgical Version Bubbles:** Creates lightweight, self-contained bubbles for conflicting packages and their *entire* historical dependency trees.
 *   **Dynamic Runtime Switching:** A seamless loader allows your scripts to activate a specific bubbled version on-demand, without changing your environment.
 *   **Efficient Deduplication:** Bubbles only contain the necessary files. All compatible dependencies are shared with the main environment, saving gigabytes of disk space.
@@ -122,6 +123,7 @@ dpncy made it work with zero conflicts."*
 - One environment, infinite package versions
 - Zero conflicts, zero waste
 - Runtime version switching without pip
+- Pip gets sent to jail. (not really, just don't forget to use your new best friend dpncy) 🐮 *"dpncy revert" coming soon*
 
 ---
 
