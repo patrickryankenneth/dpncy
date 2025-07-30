@@ -31,3 +31,33 @@ venv/
 .vscode/
 .idea/
 *.swp
+
+# Demo/Media files
+demo.gif
+demo.svg
+dpncy-demo-downloaded.cast
+dpncy-demo-raw.gif
+dpncy-demo.cast
+dpncy-demo.svg
+ezgif-1746f43cbd7236.gif
+
+# Node/JS related (if package.json is for web stuff)
+package.json
+node_modules/ # If you have a node_modules directory with package.json
+
+# Build artifacts (important!)
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.pyc
+
+# Environment folders
+venv/
+.venv/
+env/
+.env/
+
+# OS files
+.DS_Store
+Thumbs.db
