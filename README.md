@@ -13,23 +13,20 @@
 
 ## 🚀 The 1-Minute Demo: See It to Believe It
 
-<table>
-  <tr>
-    <td style="width: 65%; vertical-align: top;">
-      <img src="dpncy-demo.gif" alt="dpncy demo" style="max-width: 100%; border-radius: 8px;" />
-    </td>
-    <td style="width: 35%; vertical-align: top; padding-left: 20px;">
-      <blockquote>
+<p align="center">
+ <img src="dpncy-demo.gif" alt="dpncy demo" style="max-width: 80%; border-radius: 8px;" />
+</p>
+
+<blockquote>
 <p><strong>Words aren't enough.</strong> The best way to understand the power of <code>dpncy</code> is to see it live in action.</p>
-        ⚠️ Pip just broke your environment (as usual).<br>
-        🛠️ <code>dpncy</code> just fixed it like it was nothing.<br>
-        🎯 And now you can run both versions <em>in the same script</em>!!!
-      </blockquote>
-      <p>Yes, really. This is dependency conflict surgery, not another bandaid.</p>
-      <p> Shareable GIF: https://imgur.com/gallery/dpncy-demo-v1-0-4-IWBGBTl </p>
-    </td>
-  </tr>
-</table>
+ ⚠️ Pip just broke your environment (as usual).<br>
+ 🛠️ <code>dpncy</code> just fixed it like it was nothing.<br>
+ 🎯 And now you can run both versions <em>in the same script</em>!!!
+</blockquote>
+
+<p>Yes, really. This is dependency conflict surgery, not another bandaid.</p>
+<p> Shareable GIF: https://imgur.com/gallery/dpncy-demo-v1-0-4-IWBGBTl </p>
+>
 
 Tired of creating a new virtual environment for every small dependency conflict? I was too, until now.
 
