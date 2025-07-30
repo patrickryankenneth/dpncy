@@ -89,7 +89,7 @@ Single environment
 ## 🧠 Key Features
 
 *   **Intelligent Downgrade Protection:** Automatically detects and prevents `pip` installs that would break your existing environment.
-*   **No need to specify versions on import! dpncy intelligently ensures your script uses the correct, isolated version seamlessly, letting you simply import your_multiple_version_package the same way you would if you had one!
+*   **Smart Imports:** No need to specify versions on import! dpncy intelligently ensures your script uses the correct, isolated version seamlessly, letting you simply import your_multiple_version_package the same way you would if you had one!
 *   **Surgical Version Bubbles:** Creates lightweight, self-contained bubbles for conflicting packages and their *entire* historical dependency trees.
 *   **Dynamic Runtime Switching:** A seamless loader allows your scripts to activate a specific bubbled version on-demand, without changing your environment.
 *   **Efficient Deduplication:** Bubbles only contain the necessary files. All compatible dependencies are shared with the main environment, saving gigabytes of disk space.
