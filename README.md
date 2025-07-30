@@ -1,29 +1,40 @@
-[![Security Audit](https://github.com/patrickryankenneth/dpncy/actions/workflows/security_audit.yml/badge.svg)](https://github.com/patrickryankenneth/dpncy/actions/workflows/security_audit.yml)
----
-# dpncy - The Intelligent Python Dependency Resolver
-
-### One environment. Unlimited packages/versions/dependencies. No duplicates/downgrades ever again. You can safely delete your pipx, uv, conda, Docker, etc. today.
-
----
 <p align="center">
+  <a href="https://github.com/patrickryankenneth/dpncy/actions/workflows/security_audit.yml"><img src="https://github.com/patrickryankenneth/dpncy/actions/workflows/security_audit.yml/badge.svg" alt="Security Audit"></a>
+  <a href="https://pypi.org/project/dpncy/"><img src="https://img.shields.io/pypi/v/dpncy.svg" alt="PyPI version"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://github.com/patrickryankenneth/dpncy/actions/workflows/test.yml"><img src="https://github.com/patrickryankenneth/dpncy/actions/workflows/test.yml/badge.svg" alt="Build Status"></a>
-  <a href="https://pypi.org/project/dpncy/"><img src="https://img.shields.io/pypi/v/dpncy" alt="PyPI version"></a>
 </p>
+
+# dpncy - The Intelligent Python Dependency Resolver
+
+### One environment. Unlimited packages/versions/dependencies. No duplicates/downgrades ever again. You can safely delete pipx, uv, conda, Docker, etc. today.
 
 ---
 
 ## 🚀 The 1-Minute Demo: See It to Believe It
 
-Words aren't enough. The best way to understand the power of `dpncy` is to see it in action.
-
-![dpncy demo](dpncy-demo.gif)
+<table>
+  <tr>
+    <td style="width: 50%; vertical-align: top;">
+      <img src="dpncy-demo.gif" alt="dpncy demo" style="max-width: 100%; border-radius: 8px;" />
+    </td>
+    <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+      <blockquote>
+<p><strong>Words aren't enough.</strong> The best way to understand the power of <code>dpncy</code> is to see it live in action.</p>
+        ⚠️ Pip just broke your environment (as usual).<br>
+        🛠️ <code>dpncy</code> just fixed it like it was nothing.<br>
+        🎯 And now you can run both versions <em>in the same script</em>!!!
+      </blockquote>
+      <p>Yes, really. This is dependency conflict surgery, not another bandaid.</p>
+    </td>
+  </tr>
+</table>
 
 Tired of creating a new virtual environment for every small dependency conflict? I was too, until now.
 
 ## The Unsolvable Problem, Solved.
 
-> "I was trying to install my packages back into a 'safe' strict Conda-forge environment when I saw it: a single, forced downgrade that I couldn't resolve. At that moment, I decided I was going to solve this, no matter what it cost. In one weekend, `dpncy` was born."
+> "I was trying to install my packages back into a 'safe' no defaults Conda-forge environment when I saw it happen: a single, forced downgrade that I couldn't resolve. At that moment, I decided I was going to solve this, no matter what it cost. In one weekend, `dpncy` was born."
 
 For decades, the Python community has accepted a frustrating reality: if you need two versions of the same package, you need two virtual environments. A legacy project needing `tensorflow==1.15` and a new project needing `tensorflow==2.10` could not coexist. We've been stuck in dependency hell.
 
@@ -32,12 +43,6 @@ For decades, the Python community has accepted a frustrating reality: if you nee
 It is a revolutionary package manager that allows you to run multiple, conflicting packages and dependencies in a single Python environment. `dpncy` intelligently isolates *only* the conflicting package and its historically-correct dependencies, while your entire environment continues to share all other compatible packages.
 
 The result is one clean environment, infinite versions, and zero waste.
-
-The demo will walk you through a classic disaster scenario:
-1.  **The Disaster:** Watch `pip` destroy a perfectly good environment by forcing a downgrade for a legacy package.
-2.  **The Rescue:** See `dpncy` heroically fix the environment, restoring the modern package.
-3.  **The Right Way:** Witness `dpncy` install the old package again, this time safely isolating it in a "bubble."
-4.  **The Magic:** The grand finale shows you switching between the modern version and the bubbled version *in the same script*, proving both are available simultaneously.
 
 ---
 
@@ -91,6 +96,16 @@ Single environment
 *   **Dynamic Runtime Switching:** A seamless loader allows your scripts to activate a specific bubbled version on-demand, without changing your environment.
 *   **Efficient Deduplication:** Bubbles only contain the necessary files. All compatible dependencies are shared with the main environment, saving gigabytes of disk space.
 *   **Rich Metadata Knowledge Base:** Powered by Redis, `dpncy` builds a deep understanding of every package in your environment, including its health and security.
+
+## Your Environment Visualized
+
+├── numpy==1.26
+├── pandas==2.1
+└── .dpncy_versions (bubbles)
+    ├── tensorflow-1.15
+    │   ├── numpy==1.16  # isolated
+    └── tensorflow-2.10
+        ├── numpy==1.24  # isolated
 
 ---
 
