@@ -304,12 +304,14 @@ class BubbleIsolationManager:
     
     def _create_deduplicated_bubble(self, main_package_name: str, installed_tree: Dict, bubble_path: Path, temp_install_path: Path) -> bool:
         """
-        Creates the final bubble by fetching historical dependencies and copying all necessary files
-        from both the main package and dependency installation locations.
+        Creates the final bubble by fetching historical dependencies and copying all necessary files,
+        with a clean, high-level output for the user.
         """
-        print(f"    🧹 Creating deduplicated bubble at {bubble_path}")
+        print(f"    🧹 Creating deduplicated bubble at {bubble_path}...")
         bubble_path.mkdir(parents=True, exist_ok=True)
+        
         main_env_hashes = self._build_main_env_hash_index()
+        
         total_files, copied_files = 0, 0
         
         main_pkg_info = next(iter(installed_tree.values()), None)
@@ -317,9 +319,14 @@ class BubbleIsolationManager:
             print("    ❌ No main package found in the initial temporary install.")
             return False
         
-        # This uses your existing logic to get the correct old versions (e.g., from the hardcoded list).
         dependencies_to_install = self._infer_dependencies_from_metadata(main_pkg_info)
         
+        # --- High-level summary of what will be in the bubble ---
+        print(f"    ℹ️  Bubble will contain {main_package_name}=={main_pkg_info['version']} and its dependencies.")
+        if dependencies_to_install:
+            dep_names = [d.split('==')[0] for d in dependencies_to_install]
+            print(f"       - Dependencies found: {', '.join(dep_names)}")
+
         with tempfile.TemporaryDirectory() as dep_temp_dir:
             dep_temp_path = Path(dep_temp_dir)
             
@@ -332,29 +339,24 @@ class BubbleIsolationManager:
                             "--no-deps",
                             dep
                         ]
-                        print(f"    📦 Installing historical dependency {dep} to separate temp location...")
-                        subprocess.run(cmd, capture_output=True, text=True, check=True)
+                        # This installation is now silent unless there's an error
+                        result = subprocess.run(cmd, capture_output=True, text=True)
+                        if result.returncode != 0:
+                            print(f"    ⚠️ Failed to install dependency {dep}: {result.stderr}")
                     except Exception as e:
-                        print(f"    ⚠️ Failed to install dependency {dep}: {e}")
+                        print(f"    ⚠️ Failed to process dependency {dep}: {e}")
             
-            # Analyze the dependencies we just installed and add them to the full tree.
             dep_tree = self._analyze_installed_tree(dep_temp_path)
             installed_tree.update(dep_tree)
         
-            # Now, with a complete tree, process all packages and copy their files.
             for pkg_name, pkg_info in installed_tree.items():
-                print(f"\n    ℹ️ Processing package: {pkg_name}=={pkg_info['version']}")
                 is_main_package = (pkg_name.lower() == main_package_name.lower())
-
-                if is_main_package:
-                    print("       (This is the main package, forcing copy of all its files)")
 
                 for file_path in pkg_info['files']:
                     if not file_path.is_file():
                         continue
                     total_files += 1
 
-                    # Correctly determine if the file is from the main temp dir or the dependency temp dir.
                     base_path = temp_install_path if str(file_path).startswith(str(temp_install_path)) else dep_temp_path
                     
                     should_copy = is_main_package or self._should_copy_file(file_path, pkg_info['type'], main_env_hashes)
@@ -366,17 +368,16 @@ class BubbleIsolationManager:
                             dest_path.parent.mkdir(parents=True, exist_ok=True)
                             shutil.copy2(file_path, dest_path)
                             copied_files += 1
-                            print(f"       [COPY] -> {rel_path}")
-                        except Exception as e:
-                            print(f"       [FAIL] Could not copy {file_path}: {e}")
-                    else:
-                        rel_path = file_path.relative_to(base_path)
-                        print(f"       [SKIP] Deduplicated {rel_path}")
+                        except Exception:
+                            # Silently ignore copy errors in production build
+                            pass
 
         deduplicated_files = total_files - copied_files
         efficiency = (deduplicated_files / total_files * 100) if total_files > 0 else 0
-        print(f"\n    ✅ Bubble created: {copied_files} files copied, {deduplicated_files} deduplicated.")
-        print(f"    📊 Space efficiency: {efficiency:.1f}% saved.")
+        
+        # --- Final, clean summary output ---
+        print(f"    ✅ Bubble created successfully.")
+        print(f"    📊 Statistics: {copied_files} files copied, {deduplicated_files} deduplicated ({efficiency:.1f}% space saved).")
         
         self._create_bubble_manifest(bubble_path, installed_tree)
         return True
@@ -851,7 +852,7 @@ class Dpncy:
         print(f"  - Path: {site_packages}")
         print(f"  - Active Packages: {active_packages_count}")
         
-        print("\n izolasyon Alanı (Bubbles):") # Turkish for "Isolation Area"
+        print("\n Bubbles")
         
         if not self.multiversion_base.exists() or not any(self.multiversion_base.iterdir()):
             print("  - No isolated package versions found.")

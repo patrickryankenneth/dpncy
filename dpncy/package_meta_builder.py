@@ -15,7 +15,7 @@ import zlib
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple, Optional
 from dpncy.core import ConfigManager
 
 # Configuration and imports
@@ -220,95 +220,81 @@ class DpncyMetadataGatherer:
         print(f"\n🎉 Metadata building complete! Updated {processed_count} package(s).")
 
     def _build_comprehensive_metadata(self, package_name: str, previous_data: Dict, specific_version: str) -> Dict:
-        metadata = {
-            'name': package_name,
-            'Version': specific_version, # Keep this as the target version
-            'last_indexed': datetime.now().isoformat()
-        }
+            metadata = {
+                'name': package_name,
+                'Version': specific_version,
+                'last_indexed': datetime.now().isoformat()
+            }
+            
+            # --- LOGIC FIX START ---
+            # Initialize package_files EARLIER to ensure it always exists.
+            package_files = {'binaries': []}
+            found_specific_version_dist = False
+            
+            version_path = Path(self.config["multiversion_base"]) / f"{package_name}-{specific_version}"
+            
+            # Determine the search path: either the bubble or the main site-packages
+            search_path = version_path if version_path.is_dir() else Path(self.config["site_packages_path"])
+            
+            # Use a helper to robustly find the distribution and its files
+            dist = self._find_distribution_at_path(package_name, specific_version, search_path)
 
-        # --- NEW LOGIC START ---
-        # First, try to get metadata directly from the specific isolated version's .dist-info/egg-info
-        # OR from the main site-packages if it matches the specific_version.
-        
-        found_specific_version_dist = False
-        
-        # Check in .dpncy_versions bubble first if specific_version is isolated
-        version_path = Path(self.config["multiversion_base"]) / f"{package_name}-{specific_version}"
-        if version_path.is_dir():
-            dist_info = next((p for p in version_path.glob('*.dist-info') if p.is_dir()), None)
-            if not dist_info: # Fallback for .egg-info
-                 dist_info = next((p for p in version_path.glob('*.egg-info') if p.is_dir()), None)
-
-            if dist_info:
-                try:
-                    # Prefer METADATA or PKG-INFO
-                    metadata_file = dist_info / 'METADATA'
-                    if not metadata_file.exists():
-                        metadata_file = dist_info / 'PKG-INFO'
-                    
-                    if metadata_file.exists():
-                        with open(metadata_file, 'r', encoding='utf-8') as f:
-                            parsed_file_metadata = self._parse_metadata_file(f.read())
-                            metadata.update(parsed_file_metadata)
-                            # Ensure the 'Version' in metadata reflects the file's content
-                            # The file should contain the correct version itself.
-                            if 'Version' in parsed_file_metadata:
-                                metadata['Version'] = parsed_file_metadata['Version']
-                            if 'Requires-Dist' in parsed_file_metadata:
-                                # Parse Requires-Dist into 'dependencies' list
-                                # This handles multi-line Requires-Dist if present in file
-                                reqs = [r.strip() for r in parsed_file_metadata['Requires-Dist'].split('\n') if r.strip()]
-                                metadata['dependencies'] = reqs
-                            elif 'Requires' in parsed_file_metadata: # Older format
-                                reqs = [r.strip() for r in parsed_file_metadata['Requires'].split('\n') if r.strip()]
-                                metadata['dependencies'] = reqs
-
-                            found_specific_version_dist = True # We successfully parsed metadata for the specific version
-                except Exception as e:
-                    print(f"⚠️ Error parsing metadata from {version_path}: {e}")
-
-        # If we didn't find specific metadata in a bubble, try to get it from importlib.metadata
-        # but ONLY if the *active* distribution matches the specific_version we are trying to index.
-        if not found_specific_version_dist:
-            dist = self._get_distribution(package_name) # This gets the *active* one
-            if dist and dist.metadata.get('Version') == specific_version:
+            if dist:
+                found_specific_version_dist = True
                 for k, v in dist.metadata.items():
                     metadata[k] = v
                 metadata['dependencies'] = [str(req) for req in dist.requires] if dist.requires else []
-                found_specific_version_dist = True
-        
-        # Fallback for 'dependencies' if not found yet (e.g., from parsing dist.requires)
-        if 'dependencies' not in metadata:
-            metadata['dependencies'] = []
+                
+                # Populate package_files now that we have a valid 'dist' object
+                if dist.files:
+                    package_files['binaries'] = [
+                        str(search_path / file_path)
+                        for file_path in dist.files
+                        if "bin/" in str(file_path) and (search_path / file_path).exists()
+                    ]
 
-        # --- NEW LOGIC END ---
+            if not found_specific_version_dist:
+                # Fallback if we couldn't find a dist-info (less reliable)
+                metadata.update(self._enrich_from_site_packages(package_name, specific_version))
 
-        # The rest of the function should use the now correctly populated 'metadata' dictionary.
-        # Ensure _enrich_from_site_packages also targets the specific version's path
-        metadata.update(self._enrich_from_site_packages(package_name, specific_version))
+            # --- LOGIC FIX END ---
 
-        if self.force_refresh or 'help_text' not in previous_data:
-            # Need to carefully handle package_files path here for the correct version's binaries
-            # This is complex because _find_package_files currently relies on 'dist' which is active.
-            # You might need a new function like _find_specific_version_files(package_name, specific_version)
-            # For now, let's keep it, but be aware it might still get binaries from the active version
-            # if specific_version isn't a bubble with its own binaries.
-            active_dist_for_files = self._get_distribution(package_name) # This will be the active one
-            package_files = self._find_package_files(active_dist_for_files, package_name)
-
-            if package_files.get('binaries'):
-                metadata.update(self._get_help_output(package_files['binaries'][0]))
+            # Now, the rest of the function can safely use 'package_files'
+            if self.force_refresh or 'help_text' not in previous_data:
+                if package_files.get('binaries'):
+                    metadata.update(self._get_help_output(package_files['binaries'][0]))
+                else:
+                    metadata['help_text'] = "No executable binary found."
             else:
-                metadata['help_text'] = "No executable binary found."
-        else:
-            metadata['help_text'] = previous_data.get('help_text', "No help text available.")
+                metadata['help_text'] = previous_data.get('help_text', "No help text available.")
 
-        metadata['cli_analysis'] = self._analyze_cli(metadata.get('help_text', ''))
-        metadata['security'] = self._get_security_info(package_name)
-        # _perform_health_checks also needs to be careful about what environment it runs in
-        metadata['health'] = self._perform_health_checks(package_name, package_files) # This will run against the active version
+            metadata['cli_analysis'] = self._analyze_cli(metadata.get('help_text', ''))
+            metadata['security'] = self._get_security_info(package_name)
+            
+            # For health checks, we still check against the main installed environment
+            # as it's the only one we can reliably execute code in.
+            health_check_dist = self._get_distribution(package_name)
+            health_check_files = self._find_package_files(health_check_dist, package_name)
+            metadata['health'] = self._perform_health_checks(package_name, health_check_files)
 
-        return metadata
+            return metadata
+    
+    def _find_distribution_at_path(self, package_name: str, version: str, search_path: Path) -> Optional[importlib.metadata.Distribution]:
+        """Helper to find a specific package version's distribution in a given path."""
+        try:
+            # importlib.metadata.distributions() can be slow, so we glob first
+            # We need to handle variations in naming, e.g., "Flask_Login" vs "flask-login"
+            normalized_name = package_name.replace("-", "_")
+            for dist_info in search_path.glob(f"{normalized_name}-{version}*.dist-info"):
+                if dist_info.is_dir():
+                    from importlib.metadata import PathDistribution
+                    dist = PathDistribution(dist_info)
+                    # Verify the name and version from the metadata itself
+                    if dist.metadata["Name"].lower() == package_name.lower() and dist.metadata["Version"] == version:
+                        return dist
+        except Exception:
+            return None
+        return None
 
     def _parse_metadata_file(self, metadata_content: str) -> Dict:
         metadata = {}
