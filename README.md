@@ -4,6 +4,8 @@
 
 ### One environment. Infinite packages/versions. No duplicates/downgrades ever again.
 
+<video src="dpncy-demo.mp4" controls loop muted autoplay style="max-width: 100%; height: auto;"></video>
+
 <table>
 <tr>
 <td width="50%">
