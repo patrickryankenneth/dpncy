@@ -1,3 +1,5 @@
+[![Security Audit](https://github.com/patrickryankenneth/dpncy/actions/workflows/security_audit.yml/badge.svg)](https://github.com/patrickryankenneth/dpncy/actions/workflows/security_audit.yml)
+---
 # dpncy - The Intelligent Python Dependency Resolver
 
 ### One environment. Infinite packages/versions. No duplicates/downgrades ever again.
@@ -17,7 +19,7 @@
 </tr>
 </table>
 
---- 
+---
 
 Tired of creating a new virtual environment for every small dependency conflict? I am too.
 
