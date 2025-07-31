@@ -7,7 +7,7 @@
 
 # dpncy - The Intelligent Python Dependency Resolver
 
-### One environment. Unlimited packages/versions/dependencies. No duplicates/downgrades ever again. You can significantly reduce your reliance on pipx, uv, conda, Docker, etc. today.
+### One environment. Infinite packages/versions/dependencies. No duplicates/downgrades ever again. You can significantly reduce your reliance on pipx, uv, conda, Docker, etc. today.
 
 ---
 
@@ -266,6 +266,23 @@ Version: 0.6.3
 
 </details>
 
+
+## For the memes
+```bash
+ ____________________________________________
+/                                            \
+|  ⚠️  pip is still stuck in dpncy JAIL🔒    |
+|  Status: pip is thinking about what        |
+|          it has done wrong...              |
+|                                            |
+|  💭 'Maybe I shouldn't break deps...'      |
+\____________________________________________/
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\*
+                ||---ww |
+                ||     ||
+```
 ## 🤝 Contributing
 
 This project was born out of a real-world problem, and it thrives on community collaboration. Contributions, bug reports, and feature requests are incredibly welcome. Please feel free to check the issues page to get started.
