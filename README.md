@@ -10,6 +10,78 @@
 ### One environment. Unlimited packages/versions/dependencies. No duplicates/downgrades ever again. You can significantly reduce your reliance on pipx, uv, conda, Docker, etc. today.
 
 ---
+💥 NUMPY VERSION JUGGLING:
+
+⚡ Switching to numpy==1.24.3
+
+🌀 dpncy loader: Activating numpy==1.24.3...
+ ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/numpy-1.24.3
+ ℹ️ Bubble contains 1 packages.
+   ✅ Version: 1.24.3
+   🔢 Array sum: 6
+   🧪 Testing legacy behavior...
+   ℹ️ np.int alias exists: False
+
+⚡ Switching to numpy==1.26.4
+
+🌀 dpncy loader: Activating numpy==1.26.4...
+ 🧹 Deactivated bubble: numpy-1.24.3
+ ✅ System version already matches requested version (1.26.4). No bubble activation needed.
+   ✅ Version: 1.26.4
+   🔢 Array sum: 6
+
+🔥 SCIPY C-EXTENSION TEST:
+
+🌋 Switching to scipy==1.12.0
+
+🌀 dpncy loader: Activating scipy==1.12.0...
+ ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/scipy-1.12.0
+ ℹ️ Bubble contains 1 packages.
+   ✅ Version: 1.12.0
+   ♻️ Sparse matrix: 3 non-zeros
+   📐 Linalg det: -2.0
+
+🌋 Switching to scipy==1.15.3
+
+🌀 dpncy loader: Activating scipy==1.15.3...
+ 🧹 Deactivated bubble: scipy-1.12.0
+ ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/scipy-1.15.3
+ ℹ️ Bubble contains 1 packages.
+   ✅ Version: 1.15.3
+   ♻️ Sparse matrix: 3 non-zeros
+   📐 Linalg det: -2.0
+
+🤯 NUMPY+SCIPY VERSION MIXING:
+
+🌀 COMBO: numpy==1.24.3 + scipy==1.12.0
+
+🌀 dpncy loader: Activating numpy==1.24.3...
+ ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/numpy-1.24.3
+ ℹ️ Bubble contains 1 packages.
+
+🌀 dpncy loader: Activating scipy==1.12.0...
+ 🧹 Deactivated bubble: scipy-1.15.3
+ ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/scipy-1.12.0
+ ℹ️ Bubble contains 1 packages.
+<stdin>:47: UserWarning: The NumPy module was reloaded (imported a second time). This can in some cases result in small but subtle issues and is discouraged.
+   🧪 numpy: 1.24.3, scipy: 1.12.0
+   🔗 Compatibility check: [1. 2. 3.]
+
+🌀 COMBO: numpy==1.26.4 + scipy==1.15.3
+
+🌀 dpncy loader: Activating numpy==1.26.4...
+ 🧹 Deactivated bubble: numpy-1.24.3
+ ✅ System version already matches requested version (1.26.4). No bubble activation needed.
+
+🌀 dpncy loader: Activating scipy==1.15.3...
+ 🧹 Deactivated bubble: scipy-1.12.0
+ ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/scipy-1.15.3
+ ℹ️ Bubble contains 1 packages.
+<stdin>:47: UserWarning: The NumPy module was reloaded (imported a second time). This can in some cases result in small but subtle issues and is discouraged.
+   🧪 numpy: 1.26.4, scipy: 1.15.3
+   🔗 Compatibility check: [1. 2. 3.]
+
+🎇 DPNCY SURVIVED NUCLEAR TESTING!
 
 ## 🚀 The 1-Minute Demo: See It to Believe It
 
