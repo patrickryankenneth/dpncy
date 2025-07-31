@@ -106,7 +106,7 @@ Tired of creating a new virtual environment for every small dependency conflict?
 
 🎇 DPNCY SURVIVED NUCLEAR TESTING!
 
-<details>
+</details>
 
 ## The Unsolvable Problem, Solved.
 
