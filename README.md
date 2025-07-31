@@ -36,7 +36,7 @@
 ⚡ Switching to numpy==1.24.3
 
 🌀 dpncy loader: Activating numpy==1.24.3...
- ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/numpy-1.24.3
+ ✅ Activated bubble: /your/path/here/heaven/lib/python3.11/site-packages/.dpncy_versions/numpy-1.24.3
  ℹ️ Bubble contains 1 packages.
    ✅ Version: 1.24.3
    🔢 Array sum: 6
@@ -56,7 +56,7 @@
 🌋 Switching to scipy==1.12.0
 
 🌀 dpncy loader: Activating scipy==1.12.0...
- ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/scipy-1.12.0
+ ✅ Activated bubble: /your/path/here/heaven/lib/python3.11/site-packages/.dpncy_versions/scipy-1.12.0
  ℹ️ Bubble contains 1 packages.
    ✅ Version: 1.12.0
    ♻️ Sparse matrix: 3 non-zeros
@@ -66,7 +66,7 @@
 
 🌀 dpncy loader: Activating scipy==1.15.3...
  🧹 Deactivated bubble: scipy-1.12.0
- ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/scipy-1.15.3
+ ✅ Activated bubble: /your/path/here/heaven/lib/python3.11/site-packages/.dpncy_versions/scipy-1.15.3
  ℹ️ Bubble contains 1 packages.
    ✅ Version: 1.15.3
    ♻️ Sparse matrix: 3 non-zeros
@@ -77,12 +77,12 @@
 🌀 COMBO: numpy==1.24.3 + scipy==1.12.0
 
 🌀 dpncy loader: Activating numpy==1.24.3...
- ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/numpy-1.24.3
+ ✅ Activated bubble: /your/path/here/heaven/lib/python3.11/site-packages/.dpncy_versions/numpy-1.24.3
  ℹ️ Bubble contains 1 packages.
 
 🌀 dpncy loader: Activating scipy==1.12.0...
  🧹 Deactivated bubble: scipy-1.15.3
- ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/scipy-1.12.0
+ ✅ Activated bubble: /your/path/here/heaven/lib/python3.11/site-packages/.dpncy_versions/scipy-1.12.0
  ℹ️ Bubble contains 1 packages.
 <stdin>:47: UserWarning: The NumPy module was reloaded (imported a second time). This can in some cases result in small but subtle issues and is discouraged.
    🧪 numpy: 1.24.3, scipy: 1.12.0
@@ -96,7 +96,7 @@
 
 🌀 dpncy loader: Activating scipy==1.15.3...
  🧹 Deactivated bubble: scipy-1.12.0
- ✅ Activated bubble: /opt/conda/envs/evocoder_env/lib/python3.11/site-packages/.dpncy_versions/scipy-1.15.3
+ ✅ Activated bubble: /your/path/here/heaven/lib/python3.11/site-packages/.dpncy_versions/scipy-1.15.3
  ℹ️ Bubble contains 1 packages.
 <stdin>:47: UserWarning: The NumPy module was reloaded (imported a second time). This can in some cases result in small but subtle issues and is discouraged.
    🧪 numpy: 1.26.4, scipy: 1.15.3
