@@ -17,6 +17,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Optional
 from dpncy.core import ConfigManager
+from packaging.utils import canonicalize_name
 
 # Configuration and imports
 try:
@@ -99,6 +100,9 @@ class DpncyMetadataGatherer:
             return False
 
     def discover_all_packages(self) -> List[Tuple[str, str]]:
+        # We need this for PEP 503 normalization
+        from packaging.utils import canonicalize_name
+
         packages = {}  # {pkg_name_lower: version_str} for active environment
         isolated_packages_versions = {}  # {pkg_name_lower: set(versions)} for isolated versions
         active_packages = {}  # Track which version is actually active
@@ -106,50 +110,60 @@ class DpncyMetadataGatherer:
         # 1. Discover packages from the main site-packages (active environment)
         try:
             for dist in importlib.metadata.distributions():
-                pkg_name = dist.metadata['Name'].lower()
+                # THE FIX: Normalize the name immediately
+                pkg_name = canonicalize_name(dist.metadata['Name'])
                 version = dist.metadata['Version']
-                packages[pkg_name] = version
-                active_packages[pkg_name] = version  # This is the actually active version
+                if pkg_name not in packages:
+                    packages[pkg_name] = version
+                    active_packages[pkg_name] = version
         except Exception as e:
             print(f"⚠️ Error discovering packages from importlib.metadata: {e}")
 
-        # 2. Scan .dist-info/egg-info directly in main site-packages
+        # 2. Scan .dist-info/egg-info directly in main site-packages as a fallback
         site_packages = Path(self.config["site_packages_path"])
         if site_packages.is_dir():
             for item in site_packages.iterdir():
                 if item.is_dir() and (item.name.endswith('.dist-info') or item.name.endswith('.egg-info')):
-                    parts = item.name.split('-')
-                    if len(parts) >= 2:
-                        pkg_name = parts[0].lower()
-                        pkg_version = parts[1].rstrip('.dist-info').rstrip('.egg-info')
-                        if pkg_name not in packages:
-                            packages[pkg_name] = pkg_version
-                            active_packages[pkg_name] = pkg_version
+                    # This parsing is less reliable, but we can still normalize the result
+                    name_part = item.name.split('-')[0]
+                    # THE FIX: Normalize the name immediately
+                    pkg_name = canonicalize_name(name_part)
+                    if pkg_name not in packages:
+                        # We don't have version info here, so we have to skip or make a guess
+                        # For now, we'll rely on the importlib method as primary
+                        pass
 
         # 3. Discover packages from the .dpncy_versions isolation area
         multiversion_base_path = Path(self.config["multiversion_base"])
         if multiversion_base_path.is_dir():
             for isolated_pkg_dir in multiversion_base_path.iterdir():
                 if isolated_pkg_dir.is_dir() and '-' in isolated_pkg_dir.name:
-                    parts = isolated_pkg_dir.name.rsplit('-', 1)
-                    if len(parts) == 2:
-                        pkg_name = parts[0].lower()
-                        pkg_version = parts[1]
-                        if pkg_name not in isolated_packages_versions:
-                            isolated_packages_versions[pkg_name] = set()
-                        isolated_packages_versions[pkg_name].add(pkg_version)
+                    # Discover all packages *inside* a bubble
+                    for dist_info in isolated_pkg_dir.glob("*.dist-info"):
+                        try:
+                            from importlib.metadata import PathDistribution
+                            dist = PathDistribution(dist_info)
+                            # THE FIX: Normalize the name immediately
+                            pkg_name = canonicalize_name(dist.metadata['Name'])
+                            pkg_version = dist.metadata['Version']
+                            if pkg_name not in isolated_packages_versions:
+                                isolated_packages_versions[pkg_name] = set()
+                            isolated_packages_versions[pkg_name].add(pkg_version)
+                        except Exception:
+                            continue # Ignore broken or partial dist-info
 
-        # Store active versions in Redis for later reference
         self._store_active_versions(active_packages)
 
         # Combine active and isolated versions
         all_unique_package_versions = {}
         for pkg_name, version in packages.items():
+            # Name is already normalized here
             if pkg_name not in all_unique_package_versions:
                 all_unique_package_versions[pkg_name] = set()
             all_unique_package_versions[pkg_name].add(version)
 
         for pkg_name, versions_set in isolated_packages_versions.items():
+            # Name is already normalized here
             if pkg_name not in all_unique_package_versions:
                 all_unique_package_versions[pkg_name] = set()
             all_unique_package_versions[pkg_name].update(versions_set)
