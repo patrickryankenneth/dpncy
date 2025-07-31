@@ -15,6 +15,8 @@
 
 <p align="center">
  <img src="dpncy-demo.gif" alt="dpncy demo" style="max-width: 80%; border-radius: 8px;" />
+   <p> Shareable GIF link: https://imgur.com/gallery/dpncy-demo-v1-0-4-IWBGBTl </p>
+
 </p>
 
 <blockquote>
@@ -23,8 +25,6 @@
  🛠️ <code>dpncy</code> just fixed it like it was nothing.<br>
  🎯 And now you can run both versions <em>in the same script</em>!!!
 </blockquote>
-
-<p> Shareable GIF link: https://imgur.com/gallery/dpncy-demo-v1-0-4-IWBGBTl </p>
 
 ## Still not convinced?
 
