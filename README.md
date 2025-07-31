@@ -24,14 +24,12 @@
  🎯 And now you can run both versions <em>in the same script</em>!!!
 </blockquote>
 
-<p>Yes, really. This is TRUE dependency conflict resolution, not another bandaid solution!</p>
 <p> Shareable GIF link: https://imgur.com/gallery/dpncy-demo-v1-0-4-IWBGBTl </p>
 
-Tired of creating a new virtual environment for every small dependency conflict? I was too, until now. 
-
+## Still not convinced?
 
 <details>
-<summary>🚀 Click to view 🎇 DPNCY SURVIVE NUCLEAR TESTING (running multiple numpy, scipy versions in runtime with ease) </summary>
+<summary> Click to view 🎇 DPNCY SURVIVE NUCLEAR TESTING!!! (running MULTIPLE numpy, scipy versions in runtime with EASE) </summary>
 
 💥 NUMPY VERSION JUGGLING:
 
@@ -108,13 +106,16 @@ Tired of creating a new virtual environment for every small dependency conflict?
 
 </details>
 
+
+Tired of creating a new virtual environment for every small dependency conflict? I was too, until now.
+
 ## The Unsolvable Problem, Solved.
 
 > "I was trying to install my packages back into a 'safe' no defaults Conda-forge environment when I saw it happen: a single, forced downgrade that I couldn't resolve. At that moment, I decided I was going to solve this, no matter what it cost. In one weekend, `dpncy` was born."
 
 For decades, the Python community has accepted a frustrating reality: if you need two versions of the same package, you need two virtual environments. A legacy project needing `tensorflow==1.15` and a new project needing `tensorflow==2.10` could not coexist. We've been stuck in dependency hell.
 
-**dpncy ends dependency hell.**
+**dpncy ends dependency hell once and for all.**
 
 It is a revolutionary package manager that allows you to run multiple, conflicting packages and dependencies in a single Python environment. `dpncy` intelligently isolates *only* the conflicting package and its historically-correct dependencies, while your entire environment continues to share all other compatible packages.
 
