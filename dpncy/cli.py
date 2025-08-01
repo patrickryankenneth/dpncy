@@ -1,8 +1,8 @@
-#!/usr/-bin/env python3
+#!/usr/bin/env python3
 """
 dpncy CLI
 """
-import sys  # <--- THE MISSING LINE
+import sys
 import argparse
 from .core import Dpncy, ConfigManager
 
@@ -15,26 +15,26 @@ def print_header(title):
 def create_parser():
     """Creates and configures the argument parser."""
     parser = argparse.ArgumentParser(
-        prog='dpncy', 
+        prog='dpncy',
         description='Multi-version intelligent package installer',
         epilog='Run `dpncy` with no arguments for first-time setup or status.'
     )
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
-    
+
     install_parser = subparsers.add_parser('install', help='Install packages (with downgrade protection)')
     install_parser.add_argument('packages', nargs='+', help='Packages to install (e.g., "requests==2.25.1")')
-    
+
     info_parser = subparsers.add_parser('info', help='Show detailed package information')
     info_parser.add_argument('package', help='Package name to inspect')
     info_parser.add_argument('--version', default='active', help='Specific version to inspect')
 
     list_parser = subparsers.add_parser('list', help='List installed packages')
     list_parser.add_argument('filter', nargs='?', help='Optional filter pattern for package names')
-    
+
     status_parser = subparsers.add_parser('status', help='Show multi-version system status')
-    
+
     demo_parser = subparsers.add_parser('demo', help='Run the interactive, automated demo')
-    # Inside create_parser()
+
     stress_parser = subparsers.add_parser('stress-test', help='Run the ultimate stress test with heavy-duty packages.')
 
     reset_parser = subparsers.add_parser('reset', help='Reset the dpncy knowledge base in Redis')
@@ -66,10 +66,10 @@ def main():
 
     parser = create_parser()
     args = parser.parse_args()
-    
+
     # Create the main Dpncy object only when a command is actually run
     dpncy = Dpncy()
-    
+
     try:
         if args.command == 'install':
             return dpncy.smart_install(args.packages)
@@ -81,7 +81,7 @@ def main():
             return dpncy.show_multiversion_status()
         elif args.command == 'demo':
             from dpncy.demo import run_demo
-
+            return run_demo()
         elif args.command == 'stress-test':
             from . import stress_test
             print_header("DPNCY Ultimate Stress Test")
@@ -91,34 +91,15 @@ def main():
             if input("\nProceed with the stress test? (y/n): ").lower() != 'y':
                 print("Stress test cancelled.")
                 return 0
+            
             # This single call now handles setup, bubble creation, testing, and cleanup.
             stress_test.run()
             return 0
-            return run_demo()
         elif args.command == 'reset':
             return dpncy.reset_knowledge_base(force=args.yes)
-        
-        # Define the packages needed for the test
-        packages_to_install = [
-            # Newer versions first
-            "numpy==1.26.4",
-            "scipy==1.15.3",
-            # Older versions to create the bubbles
-            "numpy==1.24.3",
-            "scipy==1.12.0"
-        ]
-
-        print_header("Installing test packages...")
-        for pkg in packages_to_install:
-            dpncy.smart_install([pkg])
-
-        print_header("Running the Nuclear Test Script...")
-        
-        # Run the stress test script in a clean process
-        from . import stress_test
-        stress_test.run()
-        
-        return 0
+        else:
+            parser.print_help()
+            return 1
             
     except KeyboardInterrupt:
         print("\n❌ Operation cancelled by user.")
